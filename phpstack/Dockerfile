@@ -1,0 +1,8 @@
+# build a Linux/Apache/PHP container.
+# I don't feel like containerizing the damn databases.
+FROM arrjay/cc:latest
+MAINTAINER RJ Bergeron <rbergero@gmail.com>
+RUN yum update && yum -y install php php-cli httpd mod_ssl
+ENTRYPOINT ["/usr/sbin/httpd", "-D", "FOREGROUND"]
+EXPOSE 80
+EXPOSE 443
