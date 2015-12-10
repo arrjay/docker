@@ -6,7 +6,6 @@ RUN yum -y install git php-mysql
 # go get master
 RUN cd /var/www/html && git clone https://github.com/brablc/sitebar.git
 # wrapper to staple env vars into adm/config.inc.php
-COPY sitebar.run /usr/sbin/sitebar.run
-ENTRYPOINT ["/usr/sbin/sitebar.run"]
-EXPOSE 80
-EXPOSE 443
+COPY start.sh /start.sh
+ENTRYPOINT ["/start.sh"]
+EXPOSE 80 443
