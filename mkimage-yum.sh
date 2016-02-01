@@ -102,6 +102,8 @@ if [ -z "$version" ]; then
     version=$name
 fi
 
+version=${version}-$(date +%s)
+
 tar --numeric-owner -c -C "$target" . | docker import - $name:$version
 
 docker run -i -t $name:$version echo success
