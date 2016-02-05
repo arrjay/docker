@@ -94,5 +94,7 @@ EOA
 
   # feed to docker
   docker import "${r}".tar "${DNAME}":"${r}-${version}"
+
+  docker run -i -t "${DNAME}":"${r}-${version}" echo success
 done
 
