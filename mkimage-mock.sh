@@ -47,12 +47,14 @@ fi
 
 # create config tar
 scratch=$(mktemp -d --tmpdir $(basename $0).XXXXXX)
-mkdir -p "${scratch}"/etc/sysconfig
+mkdir -p             "${scratch}"/etc/sysconfig
+cp       yum.conf    "${scratch}"/etc/yum.conf
 mkdir -p --mode=0755 "${scratch}"/var/cache/yum
 mkdir -p --mode=0755 "${scratch}"/var/cache/ldconfig
 printf 'NETWORKING=yes\nHOSTNAME=localhost.localdomain\n' > "${scratch}"/etc/sysconfig/network
-printf '127.0.0.1   localhost localhost.localdomain\n' > "${scratch}"/etc/hosts
+printf '127.0.0.1   localhost localhost.localdomain\n'    > "${scratch}"/etc/hosts
 tar --numeric-owner --group=0 --owner=0 -c -C "${scratch}" --files-from=- -f "${CONFTAR}" << EOA
+./etc/yum.conf
 ./etc/hosts
 ./etc/sysconfig/network
 ./var/cache/yum
@@ -85,6 +87,8 @@ tar --delete --file="${r}".tar --files-from=- << EOA
 ./etc/ld.so.cache
 ./etc/sysconfig/network
 ./etc/hosts
+./etc/yum.conf
+./etc/yum/yum.conf
 ./builddir
 EOA
 
