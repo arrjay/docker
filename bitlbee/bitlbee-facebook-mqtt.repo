@@ -1,0 +1,7 @@
+[arrjay-bitlbee-facebook-mqtt]
+name=Copr repo for bitlbee-facebook-mqtt owned by arrjay
+baseurl=https://copr-be.cloud.fedoraproject.org/results/arrjay/bitlbee-facebook-mqtt/epel-7-$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/arrjay-bitlbee-facebook-mqtt.pub
+enabled=1
+enabled_metadata=1
