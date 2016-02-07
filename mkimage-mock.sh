@@ -140,6 +140,6 @@ EOA
 
   # clean up scratch instance, image
   docker rm "${r}-${version}"
-  docker rmi ${DNAME}":"pre-${r}-${version}"
+  docker rmi "${DNAME}":"pre-${r}-${version}"
 done
 
