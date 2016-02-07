@@ -49,6 +49,7 @@ fi
 scratch=$(mktemp -d --tmpdir $(basename $0).XXXXXX)
 mkdir -p             "${scratch}"/etc/sysconfig
 cp       yum.conf    "${scratch}"/etc/yum.conf
+cp       startup.sh  "${scratch}"/startup
 mkdir -p --mode=0755 "${scratch}"/var/cache/yum
 mkdir -p --mode=0755 "${scratch}"/var/cache/ldconfig
 printf 'NETWORKING=yes\nHOSTNAME=localhost.localdomain\n' > "${scratch}"/etc/sysconfig/network
@@ -59,6 +60,25 @@ tar --numeric-owner --group=0 --owner=0 -c -C "${scratch}" --files-from=- -f "${
 ./etc/sysconfig/network
 ./var/cache/yum
 ./var/cache/ldconfig
+./startup
+EOA
+
+# use this for rpmdb extraction
+rpmdbfiles=$(mktemp --tmpdir $(basename $0).XXXXXX)
+cat << EOA > "${rpmdbfiles}"
+./var/lib/rpm/Packages
+./var/lib/rpm/Name
+./var/lib/rpm/Basenames
+./var/lib/rpm/Group
+./var/lib/rpm/Requirename
+./var/lib/rpm/Providename
+./var/lib/rpm/Conflictname
+./var/lib/rpm/Obsoletename
+./var/lib/rpm/Triggername
+./var/lib/rpm/Dirnames
+./var/lib/rpm/Installtid
+./var/lib/rpm/Sigmd5
+./var/lib/rpm/Sha1header
 EOA
 
 # have mock make a root...
@@ -68,7 +88,16 @@ for c in "${MOCKCFGS}"/* ; do
   mock --configdir "${MOCKCFGS}" -r "${r}" --init
   cp "${MOCK_CACHEDIR}"/"${r}"/root_cache/cache.tar "${r}".tar
   # tar abuse!
-tar --delete --file="${r}".tar --files-from=- << EOA
+  rpmdbdir=$(mktemp -d --tmpdir $(basename $0).XXXXXX)
+  # first, pry the rpmdb out.
+  tar -C "${rpmdbdir}" --extract --file="${r}".tar --files-from="${rpmdbfiles}"
+  # conver db files to dump files
+  for x in "${rpmdbdir}"/var/lib/rpm/* ; do
+    /usr/lib/rpm/rpmdb_dump "${x}" > "${x}.dump"
+    rm "${x}"
+  done
+  cat "${rpmdbfiles}" | awk '{printf "%s.dump\n",$0}' | tar --numeric-owner --group=0 --owner=0 -C "${rpmdbdir}" --create --file="${r}"-rpmdb.tar --files-from=-
+  tar --delete --file="${r}".tar --files-from=- << EOA
 ./usr/lib/locale
 ./usr/share/locale
 ./lib/gconv
@@ -87,18 +116,26 @@ tar --delete --file="${r}".tar --files-from=- << EOA
 ./etc/ld.so.cache
 ./etc/sysconfig/network
 ./etc/hosts
+./etc/hosts.rpmnew
 ./etc/yum.conf
+./etc/yum.conf.rpmnew
 ./etc/yum/yum.conf
 ./builddir
+$(cat "${rpmdbfiles}")
 EOA
 
   # bring it all together
   tar --concatenate --file="${r}".tar "${DEVTAR}"
   tar --concatenate --file="${r}".tar "${CONFTAR}"
+  tar --concatenate --file="${r}".tar "${r}"-rpmdb.tar
 
   # feed to docker
-  docker import "${r}".tar "${DNAME}":"${r}-${version}"
+  docker import "${r}".tar "${DNAME}":"pre-${r}-${version}"
 
-  docker run -i -t "${DNAME}":"${r}-${version}" echo success
+  # kick docker
+  docker run -i --name "${r}-${version}" -t "${DNAME}":"pre-${r}-${version}" /startup
+
+  # export that as a new image
+  docker export "${r}-${version}" | docker import - "${DNAME}":"${r}-${version}"
 done
 
