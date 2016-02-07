@@ -137,5 +137,9 @@ EOA
 
   # export that as a new image
   docker export "${r}-${version}" | docker import - "${DNAME}":"${r}-${version}"
+
+  # clean up scratch instance, image
+  docker rm "${r}-${version}"
+  docker rmi ${DNAME}":"pre-${r}-${version}"
 done
 
