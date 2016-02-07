@@ -6,5 +6,8 @@ COPY arrjay-bitlbee-facebook-mqtt.pub /etc/pki/rpm-gpg/arrjay-bitlbee-facebook-m
 COPY bitlbee-facebook-mqtt.repo /etc/yum.repos.d/bitlbee-facebook-mqtt.repo
 RUN yum -y install epel-release && yum -y install bitlbee bitlbee-facebook
 COPY bitlbee.conf /etc/bitlbee/bitlbee.conf
-ENTRYPOINT ["/usr/sbin/bitlbee", "-n"]
+RUN mkdir /bitlbee && chown bitlbee:bitlbee /bitlbee
+COPY motd.txt /motd.txt
+RUN echo "image assembled $(date +%Y-%m-%d) ($(date +%s))" >> /motd.txt && chmod a+r /motd.txt
+ENTRYPOINT ["/usr/sbin/bitlbee", "-nv"]
 EXPOSE 6667

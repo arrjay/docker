@@ -1,0 +1,12 @@
+Welcome to the BitlBee server at %h.
+This server is running BitlBee version %v.
+                                                             
+    _/        _/    _/      _/  _/                           
+   _/_/_/        _/_/_/_/  _/  _/_/_/      _/_/      _/_/    
+  _/    _/  _/    _/      _/  _/    _/  _/_/_/_/  _/_/_/_/   
+ _/    _/  _/    _/      _/  _/    _/  _/        _/          
+_/_/_/    _/      _/_/  _/  _/_/_/      _/_/_/    _/_/_/     
+
+arrjay's bitlbee + docker image
+includes EPEL7 bitlbee + facebook-MQTT support
+
