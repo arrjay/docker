@@ -87,7 +87,8 @@ cat << EOA > "${rpmdbfiles}"
 EOA
 
 # have mock make a root...
-for c in "${MOCKCFGS}"/* ; do
+mkmock() {
+  c=${1}
   printf 'building image for %s\n' "${c}" 1>&2
   r=$(basename "${c}" .cfg)
   # remove old caches immediately before making a new one
@@ -150,12 +151,19 @@ EOA
   docker rmi "${DNAME}":"pre-${r}-${version}-${build}"
 
   # make sure image works
-  docker run "${DNAME}":"${r}-${version}-${build}" yum check-update
+  docker run --rm=true "${DNAME}":"${r}-${version}-${build}" yum check-update
 
   if [ $? -eq 0 ] ; then
     # tag as 'latest' - TODO: branching on version, not just build.
     docker tag -f "${DNAME}":"${r}-${version}-${build}" "${DNAME}":"${r}-latest"
   fi
 
-done
+}
 
+if [ -z "$1" ] ; then
+  for c in "${MOCKCFGS}"/* ; do
+    mkmock $c
+  done
+else
+  mkmock $1
+fi
