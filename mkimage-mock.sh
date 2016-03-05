@@ -1,6 +1,11 @@
 #!/bin/bash
 
-version=$(date +%s)
+# update version first
+make version.txt
+
+version=$(md5sum version.txt)
+version=${version:0:7}
+build=$(date +%s)
 
 DNAME="arrjay/cc"
 
@@ -85,6 +90,8 @@ EOA
 for c in "${MOCKCFGS}"/* ; do
   printf 'building image for %s\n' "${c}" 1>&2
   r=$(basename "${c}" .cfg)
+  # remove old caches immediately before making a new one
+  mock --configdir "${MOCKCFGS}" -r "${r}" --scrub=all
   mock --configdir "${MOCKCFGS}" -r "${r}" --init
   cp "${MOCK_CACHEDIR}"/"${r}"/root_cache/cache.tar "${r}".tar
   # tar abuse!
@@ -130,16 +137,19 @@ EOA
   tar --concatenate --file="${r}".tar "${r}"-rpmdb.tar
 
   # feed to docker
-  docker import "${r}".tar "${DNAME}":"pre-${r}-${version}"
+  docker import "${r}".tar "${DNAME}":"pre-${r}-${version}-${build}"
 
   # kick docker
-  docker run -i --name "${r}-${version}" -t "${DNAME}":"pre-${r}-${version}" /startup
+  docker run -i --name "${r}-${version}-${build}" -t "${DNAME}":"pre-${r}-${version}-${build}" /startup
 
   # export that as a new image
-  docker export "${r}-${version}" | docker import - "${DNAME}":"${r}-${version}"
+  docker export "${r}-${version}-${build}" | docker import - "${DNAME}":"${r}-${version}-${build}"
+
+  # tag as 'latest' - TODO: branching on version, not just build.
+  docker tag "${DNAME}":"${r}-${version}-${build}" "${DNAME}":"${r}-latest"
 
   # clean up scratch instance, image
-  docker rm "${r}-${version}"
-  docker rmi "${DNAME}":"pre-${r}-${version}"
+  docker rm "${r}-${version}-${build}"
+  docker rmi "${DNAME}":"pre-${r}-${version}-${build}"
 done
 
