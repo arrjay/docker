@@ -145,11 +145,17 @@ EOA
   # export that as a new image
   docker export "${r}-${version}-${build}" | docker import - "${DNAME}":"${r}-${version}-${build}"
 
-  # tag as 'latest' - TODO: branching on version, not just build.
-  docker tag "${DNAME}":"${r}-${version}-${build}" "${DNAME}":"${r}-latest"
-
   # clean up scratch instance, image
   docker rm "${r}-${version}-${build}"
   docker rmi "${DNAME}":"pre-${r}-${version}-${build}"
+
+  # make sure image works
+  docker run "${DNAME}":"${r}-${version}-${build}" yum check-update
+
+  if [ $? -eq 0 ] ; then
+    # tag as 'latest' - TODO: branching on version, not just build.
+    docker tag -f "${DNAME}":"${r}-${version}-${build}" "${DNAME}":"${r}-latest"
+  fi
+
 done
 
