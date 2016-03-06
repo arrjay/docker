@@ -1,0 +1,8 @@
+[arrjay-bitlbee]
+name=Copr repo for bitlbee owned by arrjay
+baseurl=https://copr-be.cloud.fedoraproject.org/results/arrjay/bitlbee/epel-7-$basearch/
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=/etc/pki/rpm-gpg/arrjay-bitlbee.pub
+enabled=1
+enabled_metadata=1
