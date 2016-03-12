@@ -1,0 +1,8 @@
+[arrjay-znc-modules]
+name=Copr repo for znc-modules owned by arrjay
+baseurl=https://copr-be.cloud.fedoraproject.org/results/arrjay/znc-modules/epel-7-$basearch/
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/arrjay-znc-modules.pub
+enabled=1
+enabled_metadata=1
