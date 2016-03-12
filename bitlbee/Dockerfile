@@ -1,5 +1,4 @@
-# build a Linux/Apache/PHP container.
-# I don't feel like containerizing the damn databases.
+# bitlbee with faceboot-mqtt support
 FROM arrjay/cc:c7-latest
 MAINTAINER RJ Bergeron <rbergero@gmail.com>
 COPY arrjay-bitlbee-facebook-mqtt.pub /etc/pki/rpm-gpg/arrjay-bitlbee-facebook-mqtt.pub
@@ -11,7 +10,8 @@ RUN yum -y install epel-release && yum -y install bitlbee-facebook
 COPY bitlbee.conf /etc/bitlbee/bitlbee.conf
 RUN mkdir /bitlbee && chown bitlbee:bitlbee /bitlbee
 COPY motd.txt /motd.txt
+COPY start.sh /start.sh
 RUN echo "image assembled $(date +%Y-%m-%d) ($(date +%s))" >> /motd.txt && chmod a+r /motd.txt
 VOLUME ["/bitlbee"]
-ENTRYPOINT ["/usr/sbin/bitlbee", "-nv"]
+ENTRYPOINT ["/start.sh"]
 EXPOSE 6667
