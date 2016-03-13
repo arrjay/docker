@@ -5,7 +5,9 @@ MAINTAINER RJ Bergeron <rbergero@gmail.com>
 RUN yum -y install make gcc
 ADD http://www.psybnc.at/download/beta/psyBNC-2.3.2-7.tar.gz /usr/src/
 RUN tar xf /usr/src/psyBNC-2.3.2-7.tar.gz -C /usr/src
-RUN cd /usr/src/psybnc && make && cp psybnc /usr/bin
+RUN cd /usr/src/psybnc && make && rm salt.h && cp psybnc /usr/bin
 RUN yum -y remove make gcc
 COPY start.sh /
-ENTRYPOINT ["./start.sh","/psybnc.conf"]
+RUN mkdir /runtime
+VOLUME ["/runtime"]
+ENTRYPOINT ["./start.sh"]

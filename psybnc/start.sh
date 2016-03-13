@@ -4,7 +4,10 @@
 cd /usr/src/psybnc
 
 # start psybnc with args
-/usr/bin/psybnc $1
+/usr/bin/psybnc /runtime/psybnc.conf
+
+# watch the log in the background
+tail -F log/psybnc.log &
 
 # die if no pid file
 if [ ! -f psybnc.pid ] ; then exit 1 ; fi
