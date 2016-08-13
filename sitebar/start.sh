@@ -7,7 +7,7 @@ cat <<END_CONFIG>/var/www/html/sitebar/adm/config.inc.php
 (
   'db' => array
   (
-    'host'     => 'mysql',
+    'host'     => '$MYSQL_HOST',
     'username' => 'sitebar',
     'password' => $SITEBAR_PASS,
     'name'     => 'sitebar',
