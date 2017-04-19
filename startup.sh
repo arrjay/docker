@@ -13,6 +13,8 @@ done
 
 rpm --rebuilddb
 
+yum clean all
+
 # if we find ourselves, delete ourselves.
 if [[ -s "$BASH_SOURCE" ]] && [[ -x "$BASH_SOURCE" ]]; then
         rm $(readlink -f "$BASH_SOURCE")
