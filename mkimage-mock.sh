@@ -155,7 +155,7 @@ EOA
 
   if [ $? -eq 0 ] ; then
     # tag as 'latest' - TODO: branching on version, not just build.
-    docker tag -f "${DNAME}":"${r}-${version}-${build}" "${DNAME}":"${r}-latest"
+    docker tag  "${DNAME}":"${r}-${version}-${build}" "${DNAME}":"${r}-latest"
     docker push "${DNAME}":"${r}-${version}-${build}"
     docker push "${DNAME}":"${r}-latest"
   fi
